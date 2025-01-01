@@ -141,21 +141,6 @@ module turbos_clmm::position_manager {
         abort 0
     }
 
-    public fun decrease_liquidity_with_return_<CoinTypeA, CoinTypeB, FeeType>(
-        pool: &mut Pool<CoinTypeA, CoinTypeB, FeeType>,
-        positions: &mut Positions,
-        nft: &mut TurbosPositionNFT,
-        liquidity: u128,
-        amount_a_min: u64,
-        amount_b_min: u64,
-        deadline: u64,
-        clock: &Clock,
-        versioned: &Versioned,
-        ctx: &mut TxContext
-    ): (Coin<CoinTypeA>, Coin<CoinTypeB>) {
-        abort 0
-    }
-
     public entry fun mint<CoinTypeA, CoinTypeB, FeeType>(
 		pool: &mut Pool<CoinTypeA, CoinTypeB, FeeType>,
 		positions: &mut Positions,
@@ -519,29 +504,42 @@ module turbos_clmm::position_manager {
         sui::transfer::public_transfer<sui::coin::Coin<CoinTypeB>>(v1, v2);
     }
     
-    public fun decrease_liquidity_with_return_<CoinTypeA, CoinTypeB, FeeType>(arg0: &mut turbos_clmm::pool::Pool<CoinTypeA, CoinTypeB, FeeType>, arg1: &mut Positions, arg2: &mut turbos_clmm::position_nft::TurbosPositionNFT, arg3: u128, arg4: u64, arg5: u64, arg6: u64, arg7: &sui::clock::Clock, arg8: &turbos_clmm::pool::Versioned, arg9: &mut sui::tx_context::TxContext) : (sui::coin::Coin<CoinTypeA>, sui::coin::Coin<CoinTypeB>) {
-        turbos_clmm::pool::check_version(arg8);
-        assert!(sui::object::id<turbos_clmm::pool::Pool<CoinTypeA, CoinTypeB, FeeType>>(arg0) == turbos_clmm::position_nft::pool_id(arg2), 15);
-        assert!(sui::clock::timestamp_ms(arg7) <= arg6, 8);
-        let v0 = sui::object::id_address<turbos_clmm::position_nft::TurbosPositionNFT>(arg2);
-        let v1 = sui::dynamic_object_field::borrow_mut<address, Position>(&mut arg1.id, v0);
-        assert!(v1.liquidity >= arg3, 9);
-        let v2 = if (turbos_clmm::pool::check_position_exists<CoinTypeA, CoinTypeB, FeeType>(arg0, v0, v1.tick_lower_index, v1.tick_upper_index)) {
+    public fun decrease_liquidity_with_return_<CoinTypeA, CoinTypeB, FeeType>(
+        pool: &mut turbos_clmm::pool::Pool<CoinTypeA, CoinTypeB, FeeType>,
+        positions: &mut Positions,
+        nft: &mut turbos_clmm::position_nft::TurbosPositionNFT,
+        liquidity: u128,
+        amount_a_min: u64,
+        amount_b_min: u64,
+        deadline: u64,
+        clock: &sui::clock::Clock,
+        versioned: &turbos_clmm::pool::Versioned,
+        ctx: &mut sui::tx_context::TxContext
+    ) : (sui::coin::Coin<CoinTypeA>, sui::coin::Coin<CoinTypeB>) {
+        turbos_clmm::pool::check_version(versioned);
+        assert!(sui::object::id<turbos_clmm::pool::Pool<CoinTypeA, CoinTypeB, FeeType>>(pool) == turbos_clmm::position_nft::pool_id(nft), 15);
+        assert!(sui::clock::timestamp_ms(clock) <= deadline, 8);
+        let v0 = sui::object::id_address<turbos_clmm::position_nft::TurbosPositionNFT>(nft);
+        let v1 = sui::dynamic_object_field::borrow_mut<address, Position>(&mut positions.id, v0);
+        assert!(v1.liquidity >= liquidity, 9);
+        let v2 = if (turbos_clmm::pool::check_position_exists<CoinTypeA, CoinTypeB, FeeType>(pool, v0, v1.tick_lower_index, v1.tick_upper_index)) {
             v0
         } else {
-            sui::tx_context::sender(arg9)
+            sui::tx_context::sender(ctx)
         };
-        let (v3, v4) = turbos_clmm::pool::burn<CoinTypeA, CoinTypeB, FeeType>(arg0, v2, v1.tick_lower_index, v1.tick_upper_index, arg3, arg7, arg9);
-        assert!(v3 >= arg4 && arg5 >= arg5, 5);
-        copy_position<CoinTypeA, CoinTypeB, FeeType>(arg0, turbos_clmm::pool::get_position_key(v2, v1.tick_lower_index, v1.tick_upper_index), v1);
-        let (v5, v6) = turbos_clmm::pool::split_out_and_return_<CoinTypeA, CoinTypeB, FeeType>(arg0, v3, v4, arg9);
-        let v7 = DecreaseLiquidityEvent{
-            pool      : sui::object::id<turbos_clmm::pool::Pool<CoinTypeA, CoinTypeB, FeeType>>(arg0), 
+        let (v3, v4) = turbos_clmm::pool::burn<CoinTypeA, CoinTypeB, FeeType>(pool, v2, v1.tick_lower_index, v1.tick_upper_index, liquidity, clock, ctx);
+        assert!(v3 >= amount_a_min && amount_b_min >= amount_b_min, 5);
+        copy_position<CoinTypeA, CoinTypeB, FeeType>(pool, turbos_clmm::pool::get_position_key(v2, v1.tick_lower_index, v1.tick_upper_index), v1);
+        let (v5, v6) = turbos_clmm::pool::split_out_and_return_<CoinTypeA, CoinTypeB, FeeType>(pool, v3, v4, ctx);
+
+        let event = DecreaseLiquidityEvent{
+            pool      : sui::object::id<turbos_clmm::pool::Pool<CoinTypeA, CoinTypeB, FeeType>>(pool), 
             amount_a  : v3, 
             amount_b  : v4, 
-            liquidity : arg3,
+            liquidity : liquidity,
         };
-        sui::event::emit<DecreaseLiquidityEvent>(v7);
+        sui::event::emit<DecreaseLiquidityEvent>(event);
+        
         (v5, v6)
     }
     
