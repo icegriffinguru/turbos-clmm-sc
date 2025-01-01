@@ -163,15 +163,6 @@ module turbos_clmm::position_manager {
         abort 0
     }
 
-    public entry fun burn<CoinTypeA, CoinTypeB, FeeType>(
-        positions: &mut Positions,
-        nft: TurbosPositionNFT,
-        versioned: &Versioned,
-        _ctx: &mut TxContext
-    ) {
-        abort 0
-    }
-
     public entry fun increase_liquidity<CoinTypeA, CoinTypeB, FeeType>(
 		pool: &mut Pool<CoinTypeA, CoinTypeB, FeeType>,
 		positions: &mut Positions,
@@ -275,18 +266,23 @@ module turbos_clmm::position_manager {
         (position.tick_lower_index, position.tick_upper_index, position.liquidity)
     }
 
-    public entry fun burn<CoinTypeA, CoinTypeB, FeeType>(arg0: &mut Positions, arg1: turbos_clmm::position_nft::TurbosPositionNFT, arg2: &turbos_clmm::pool::Versioned, arg3: &mut sui::tx_context::TxContext) {
-        turbos_clmm::pool::check_version(arg2);
-        let v0 = sui::object::id_address<turbos_clmm::position_nft::TurbosPositionNFT>(&arg1);
-        let v1 = sui::dynamic_object_field::borrow_mut<address, Position>(&mut arg0.id, v0);
-        assert!(v1.liquidity == 0 && v1.tokens_owed_a == 0 && v1.tokens_owed_b == 0, 6);
-        let v2 = 0;
-        while (v2 < std::vector::length<PositionRewardInfo>(&v1.reward_infos)) {
-            assert!(std::vector::borrow<PositionRewardInfo>(&v1.reward_infos, v2).amount_owed == 0, 6);
-            v2 = v2 + 1;
+    public entry fun burn<CoinTypeA, CoinTypeB, FeeType>(
+        positions: &mut Positions,
+        nft: TurbosPositionNFT,
+        versioned: &Versioned,
+        _ctx: &mut TxContext
+    ) {
+        turbos_clmm::pool::check_version(versioned);
+        let nft_address = sui::object::id_address<turbos_clmm::position_nft::TurbosPositionNFT>(&nft);
+        let position = sui::dynamic_object_field::borrow_mut<address, Position>(&mut positions.id, nft_address);
+        assert!(position.liquidity == 0 && position.tokens_owed_a == 0 && position.tokens_owed_b == 0, 6);
+        let i = 0;
+        while (i < std::vector::length<PositionRewardInfo>(&position.reward_infos)) {
+            assert!(std::vector::borrow<PositionRewardInfo>(&position.reward_infos, i).amount_owed == 0, 6);
+            i = i + 1;
         };
-        delete_user_position(arg0, v0);
-        burn_nft(arg1);
+        delete_user_position(positions, nft_address);
+        burn_nft(nft);
     }
     
     public fun collect_reward_with_return_<CoinTypeA, CoinTypeB, FeeType, T3>(arg0: &mut turbos_clmm::pool::Pool<CoinTypeA, CoinTypeB, FeeType>, arg1: &mut Positions, arg2: &mut turbos_clmm::position_nft::TurbosPositionNFT, arg3: &mut turbos_clmm::pool::PoolRewardVault<T3>, arg4: u64, arg5: u64, arg6: address, arg7: u64, arg8: &sui::clock::Clock, arg9: &turbos_clmm::pool::Versioned, arg10: &mut sui::tx_context::TxContext) : sui::coin::Coin<T3> {
