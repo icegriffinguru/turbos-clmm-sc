@@ -326,14 +326,35 @@ module turbos_clmm::swap_router {
         turbos_clmm::pool::swap_coin_a_b_c_b_with_return_<T0, T1, T2, T3, T4>(arg0, arg1, turbos_clmm::pool::merge_coin<T0>(arg2), v0, v1, v2, arg12)
     }
     
-    public fun swap_a_b_with_return_<T0, T1, T2>(arg0: &mut turbos_clmm::pool::Pool<T0, T1, T2>, arg1: vector<0x2::coin::Coin<T0>>, arg2: u64, arg3: u64, arg4: u128, arg5: bool, arg6: address, arg7: u64, arg8: &0x2::clock::Clock, arg9: &turbos_clmm::pool::Versioned, arg10: &mut 0x2::tx_context::TxContext) : (0x2::coin::Coin<T1>, 0x2::coin::Coin<T0>) {
+    public fun swap_a_b_with_return_<T0, T1, T2>(
+        pool: &mut turbos_clmm::pool::Pool<T0, T1, T2>,
+        coins: vector<0x2::coin::Coin<T0>>,
+        swap_amount: u64,
+        amount_threshold: u64,
+        sqrt_price: u128,
+        is_exact_in: bool,
+        recipient: address,
+        deadline: u64,
+        arg8: &0x2::clock::Clock,
+        arg9: &turbos_clmm::pool::Versioned,
+        arg10: &mut 0x2::tx_context::TxContext
+    ) : (0x2::coin::Coin<T1>, 0x2::coin::Coin<T0>) {
         turbos_clmm::pool::check_version(arg9);
-        assert!(0x2::clock::timestamp_ms(arg8) <= arg7, 2);
-        let (v0, v1) = turbos_clmm::pool::swap<T0, T1, T2>(arg0, arg6, true, (arg2 as u128), arg5, arg4, arg8, arg10);
+        assert!(0x2::clock::timestamp_ms(arg8) <= deadline, 2);
+        let (v0, v1) = turbos_clmm::pool::swap<T0, T1, T2>(
+            pool,
+            recipient,
+            true,
+            (swap_amount as u128),
+            is_exact_in,
+            sqrt_price,
+            arg8,
+            arg10
+        );
         let v2 = (v0 as u64);
         let v3 = (v1 as u64);
-        check_amount_threshold(arg5, true, v2, v3, arg3);
-        turbos_clmm::pool::swap_coin_a_b_with_return_<T0, T1, T2>(arg0, turbos_clmm::pool::merge_coin<T0>(arg1), v2, v3, arg10)
+        check_amount_threshold(is_exact_in, true, v2, v3, amount_threshold);
+        turbos_clmm::pool::swap_coin_a_b_with_return_<T0, T1, T2>(pool, turbos_clmm::pool::merge_coin<T0>(coins), v2, v3, arg10)
     }
     
     public entry fun swap_b_a<T0, T1, T2>(arg0: &mut turbos_clmm::pool::Pool<T0, T1, T2>, arg1: vector<0x2::coin::Coin<T1>>, arg2: u64, arg3: u64, arg4: u128, arg5: bool, arg6: address, arg7: u64, arg8: &0x2::clock::Clock, arg9: &turbos_clmm::pool::Versioned, arg10: &mut 0x2::tx_context::TxContext) {

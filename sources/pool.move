@@ -222,8 +222,17 @@ module turbos_clmm::pool {
         abort 0
     }
 
-    public(friend) fun swap<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: bool, arg3: u128, arg4: bool, arg5: u128, arg6: &0x2::clock::Clock, arg7: &mut 0x2::tx_context::TxContext) : (u128, u128) {
-        let v0 = compute_swap_result<T0, T1, T2>(arg0, arg1, arg2, arg3, arg4, arg5, false, arg6, arg7);
+    public(friend) fun swap<T0, T1, T2>(
+        pool: &mut Pool<T0, T1, T2>,
+        recipient: address,
+        arg2: bool,
+        swap_amount: u128,
+        is_exact_in: bool,
+        sqrt_price: u128,
+        arg6: &0x2::clock::Clock,
+        arg7: &mut 0x2::tx_context::TxContext
+    ) : (u128, u128) {
+        let v0 = compute_swap_result<T0, T1, T2>(pool, recipient, arg2, swap_amount, is_exact_in, sqrt_price, false, arg6, arg7);
         (v0.amount_a, v0.amount_b)
     }
     
@@ -440,50 +449,50 @@ module turbos_clmm::pool {
     }
     
     public(friend) fun compute_swap_result<T0, T1, T2>(
-        arg0: &mut Pool<T0, T1, T2>,
+        pool: &mut Pool<T0, T1, T2>,
         recipient: address,
         a_to_b: bool,
-        arg3: u128,
+        swap_amount: u128,
         is_exact_in: bool,
-        arg5: u128,
+        sqrt_price: u128,
         arg6: bool,
         arg7: &0x2::clock::Clock,
         arg8: &mut 0x2::tx_context::TxContext
     ) : ComputeSwapState {
-        assert!(arg0.unlocked, 8);
-        assert!(arg3 != 0, 7);
-        if (arg5 < 4295048016 || arg5 > 79226673515401279992447579055) {
+        assert!(pool.unlocked, 8);
+        assert!(swap_amount != 0, 7);
+        if (sqrt_price < 4295048016 || sqrt_price > 79226673515401279992447579055) {
             abort 19
         };
-        let v0 = if (a_to_b && arg5 > arg0.sqrt_price) {
+        let v0 = if (a_to_b && sqrt_price > pool.sqrt_price) {
             true
         } else {
-            let v1 = !a_to_b && arg5 < arg0.sqrt_price;
+            let v1 = !a_to_b && sqrt_price < pool.sqrt_price;
             v1
         };
         if (v0) {
             abort 20
         };
-        let v2 = next_pool_reward_infos<T0, T1, T2>(arg0, 0x2::clock::timestamp_ms(arg7));
+        let v2 = next_pool_reward_infos<T0, T1, T2>(pool, 0x2::clock::timestamp_ms(arg7));
         let v3 = if (a_to_b) {
-            arg0.fee_growth_global_a
+            pool.fee_growth_global_a
         } else {
-            arg0.fee_growth_global_b
+            pool.fee_growth_global_b
         };
         let v4 = ComputeSwapState{
             amount_a                   : 0, 
             amount_b                   : 0, 
-            amount_specified_remaining : arg3, 
+            amount_specified_remaining : swap_amount, 
             amount_calculated          : 0, 
-            sqrt_price                 : arg0.sqrt_price, 
-            tick_current_index         : arg0.tick_current_index, 
+            sqrt_price                 : pool.sqrt_price, 
+            tick_current_index         : pool.tick_current_index, 
             fee_growth_global          : v3, 
             protocol_fee               : 0, 
-            liquidity                  : arg0.liquidity, 
+            liquidity                  : pool.liquidity, 
             fee_amount                 : 0,
         };
-        while (v4.amount_specified_remaining > 0 && v4.sqrt_price != arg5) {
-            let (v5, v6) = next_initialized_tick_within_one_word<T0, T1, T2>(arg0, v4.tick_current_index, a_to_b);
+        while (v4.amount_specified_remaining > 0 && v4.sqrt_price != sqrt_price) {
+            let (v5, v6) = next_initialized_tick_within_one_word<T0, T1, T2>(pool, v4.tick_current_index, a_to_b);
             let v7 = v5;
             if (turbos_clmm::i32::lt(v5, turbos_clmm::i32::neg_from(443636))) {
                 v7 = turbos_clmm::i32::neg_from(443636);
@@ -493,12 +502,12 @@ module turbos_clmm::pool {
                 };
             };
             let v8 = turbos_clmm::math_tick::sqrt_price_from_tick_index(v7);
-            let v9 = if (a_to_b && v8 < arg5 || v8 > arg5) {
-                arg5
+            let v9 = if (a_to_b && v8 < sqrt_price || v8 > sqrt_price) {
+                sqrt_price
             } else {
                 v8
             };
-            let (v10, v11, v12, v13) = turbos_clmm::math_swap::compute_swap(v4.sqrt_price, v9, v4.liquidity, v4.amount_specified_remaining, is_exact_in, arg0.fee);
+            let (v10, v11, v12, v13) = turbos_clmm::math_swap::compute_swap(v4.sqrt_price, v9, v4.liquidity, v4.amount_specified_remaining, is_exact_in, pool.fee);
             let v14 = v13;
             v4.sqrt_price = v10;
             if (is_exact_in) {
@@ -509,8 +518,8 @@ module turbos_clmm::pool {
                 v4.amount_calculated = v4.amount_calculated + v11 + v13;
             };
             v4.fee_amount = v4.fee_amount + v13;
-            if (arg0.fee_protocol > 0) {
-                let v15 = v13 * (arg0.fee_protocol as u128) / 1000000;
+            if (pool.fee_protocol > 0) {
+                let v15 = v13 * (pool.fee_protocol as u128) / 1000000;
                 v14 = v13 - v15;
                 v4.protocol_fee = turbos_clmm::math_u128::wrapping_add(v4.protocol_fee, v15);
             };
@@ -522,14 +531,14 @@ module turbos_clmm::pool {
                     let v16 = if (a_to_b) {
                         v4.fee_growth_global
                     } else {
-                        arg0.fee_growth_global_a
+                        pool.fee_growth_global_a
                     };
                     let v17 = if (a_to_b) {
-                        arg0.fee_growth_global_b
+                        pool.fee_growth_global_b
                     } else {
                         v4.fee_growth_global
                     };
-                    let v18 = cross_tick<T0, T1, T2>(arg0, v7, v16, v17, &v2, arg6, arg8);
+                    let v18 = cross_tick<T0, T1, T2>(pool, v7, v16, v17, &v2, arg6, arg8);
                     let v19 = v18;
                     if (a_to_b) {
                         v19 = turbos_clmm::i128::neg(v18);
@@ -550,42 +559,42 @@ module turbos_clmm::pool {
             };
         };
         if (!arg6) {
-            if (!turbos_clmm::i32::eq(v4.tick_current_index, arg0.tick_current_index)) {
-                arg0.sqrt_price = v4.sqrt_price;
-                arg0.tick_current_index = v4.tick_current_index;
+            if (!turbos_clmm::i32::eq(v4.tick_current_index, pool.tick_current_index)) {
+                pool.sqrt_price = v4.sqrt_price;
+                pool.tick_current_index = v4.tick_current_index;
             } else {
-                arg0.sqrt_price = v4.sqrt_price;
+                pool.sqrt_price = v4.sqrt_price;
             };
-            if (arg0.liquidity != v4.liquidity) {
-                arg0.liquidity = v4.liquidity;
+            if (pool.liquidity != v4.liquidity) {
+                pool.liquidity = v4.liquidity;
             };
             if (a_to_b) {
-                arg0.fee_growth_global_a = v4.fee_growth_global;
+                pool.fee_growth_global_a = v4.fee_growth_global;
                 if (v4.protocol_fee > 0) {
-                    arg0.protocol_fees_a = arg0.protocol_fees_a + (v4.protocol_fee as u64);
+                    pool.protocol_fees_a = pool.protocol_fees_a + (v4.protocol_fee as u64);
                 };
             } else {
-                arg0.fee_growth_global_b = v4.fee_growth_global;
+                pool.fee_growth_global_b = v4.fee_growth_global;
                 if (v4.protocol_fee > 0) {
-                    arg0.protocol_fees_b = arg0.protocol_fees_b + (v4.protocol_fee as u64);
+                    pool.protocol_fees_b = pool.protocol_fees_b + (v4.protocol_fee as u64);
                 };
             };
         };
         let (v21, v22) = if (a_to_b == is_exact_in) {
-            (arg3 - v4.amount_specified_remaining, v4.amount_calculated)
+            (swap_amount - v4.amount_specified_remaining, v4.amount_calculated)
         } else {
-            (v4.amount_calculated, arg3 - v4.amount_specified_remaining)
+            (v4.amount_calculated, swap_amount - v4.amount_specified_remaining)
         };
         v4.amount_a = v21;
         v4.amount_b = v22;
         let v23 = SwapEvent{
-            pool               : 0x2::object::id<Pool<T0, T1, T2>>(arg0), 
+            pool               : 0x2::object::id<Pool<T0, T1, T2>>(pool), 
             recipient          : recipient, 
             amount_a           : (v4.amount_a as u64), 
             amount_b           : (v4.amount_b as u64), 
             liquidity          : v4.liquidity, 
             tick_current_index : v4.tick_current_index, 
-            tick_pre_index     : arg0.tick_current_index, 
+            tick_pre_index     : pool.tick_current_index, 
             sqrt_price         : v4.sqrt_price, 
             protocol_fee       : (v4.protocol_fee as u64), 
             fee_amount         : (v4.fee_amount as u64), 
@@ -595,7 +604,7 @@ module turbos_clmm::pool {
         0x2::event::emit<SwapEvent>(v23);
         v4
     }
-    
+
     fun cross_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: u128, arg3: u128, arg4: &vector<u128>, arg5: bool, arg6: &mut 0x2::tx_context::TxContext) : turbos_clmm::i128::I128 {
         let v0 = if (!0x2::dynamic_field::exists_<turbos_clmm::i32::I32>(&arg0.id, arg1)) {
             init_tick<T0, T1, T2>(arg0, arg1, arg6)
