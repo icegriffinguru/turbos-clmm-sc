@@ -227,8 +227,8 @@ module turbos_clmm::pool {
         (v0.amount_a, v0.amount_b)
     }
     
-    public fun get_position_key(arg0: address, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : 0x1::string::String {
-        0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::string_tools::get_position_key(arg0, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::abs_u32(arg1), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::is_neg(arg1), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::abs_u32(arg2), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::is_neg(arg2))
+    public fun get_position_key(arg0: address, arg1: turbos_clmm::i32::I32, arg2: turbos_clmm::i32::I32) : 0x1::string::String {
+        turbos_clmm::string_tools::get_position_key(arg0, turbos_clmm::i32::abs_u32(arg1), turbos_clmm::i32::is_neg(arg1), turbos_clmm::i32::abs_u32(arg2), turbos_clmm::i32::is_neg(arg2))
     }
     
     public(friend) fun add_reward<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: u64, arg3: 0x2::coin::Coin<T3>, arg4: u64, arg5: &0x2::clock::Clock, arg6: &mut 0x2::tx_context::TxContext) {
@@ -253,13 +253,13 @@ module turbos_clmm::pool {
         0x2::event::emit<AddRewardEvent>(v1);
     }
     
-    public(friend) fun burn<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: u128, arg5: &0x2::clock::Clock, arg6: &mut 0x2::tx_context::TxContext) : (u64, u64) {
+    public(friend) fun burn<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32, arg4: u128, arg5: &0x2::clock::Clock, arg6: &mut 0x2::tx_context::TxContext) : (u64, u64) {
         if (0x2::object::id_address<Pool<T0, T1, T2>>(arg0) != 0x2::address::from_u256(60148000886971066743225759181777648498219832128502871752008364769916836265492)) {
             assert!(arg0.unlocked, 8);
         };
-        let (v0, v1) = modify_position<T0, T1, T2>(arg0, arg1, arg2, arg3, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::neg_from(arg4), arg5, arg6);
-        let v2 = (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::abs_u128(v0) as u64);
-        let v3 = (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::abs_u128(v1) as u64);
+        let (v0, v1) = modify_position<T0, T1, T2>(arg0, arg1, arg2, arg3, turbos_clmm::i128::neg_from(arg4), arg5, arg6);
+        let v2 = (turbos_clmm::i128::abs_u128(v0) as u64);
+        let v3 = (turbos_clmm::i128::abs_u128(v1) as u64);
         let v4 = BurnEvent{
             pool             : 0x2::object::id<Pool<T0, T1, T2>>(arg0), 
             owner            : arg1, 
@@ -273,14 +273,14 @@ module turbos_clmm::pool {
         (v2, v3)
     }
     
-    public fun check_position_exists<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : bool {
+    public fun check_position_exists<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: address, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32) : bool {
         0x2::dynamic_object_field::exists_<0x1::string::String>(&arg0.id, get_position_key(arg1, arg2, arg3))
     }
     
-    fun check_ticks(arg0: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) {
-        assert!(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lt(arg0, arg1), 5);
-        assert!(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::gte(arg0, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::neg_from(443636)), 5);
-        assert!(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lte(arg1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(443636)), 5);
+    fun check_ticks(arg0: turbos_clmm::i32::I32, arg1: turbos_clmm::i32::I32) {
+        assert!(turbos_clmm::i32::lt(arg0, arg1), 5);
+        assert!(turbos_clmm::i32::gte(arg0, turbos_clmm::i32::neg_from(443636)), 5);
+        assert!(turbos_clmm::i32::lte(arg1, turbos_clmm::i32::from(443636)), 5);
     }
     
     public fun check_version(arg0: &Versioned) {
@@ -303,16 +303,16 @@ module turbos_clmm::pool {
         v0.tokens_owed_b = 0;
     }
     
-    fun clear_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: &mut 0x2::tx_context::TxContext) {
-        let v0 = 0x2::dynamic_field::borrow_mut<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, Tick>(&mut arg0.id, arg1);
+    fun clear_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: &mut 0x2::tx_context::TxContext) {
+        let v0 = 0x2::dynamic_field::borrow_mut<turbos_clmm::i32::I32, Tick>(&mut arg0.id, arg1);
         v0.liquidity_gross = 0;
-        v0.liquidity_net = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero();
+        v0.liquidity_net = turbos_clmm::i128::zero();
         v0.fee_growth_outside_a = 0;
         v0.fee_growth_outside_b = 0;
         v0.initialized = false;
     }
     
-    public(friend) fun collect<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: u64, arg5: u64, arg6: &mut 0x2::tx_context::TxContext) : (u64, u64) {
+    public(friend) fun collect<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32, arg4: u64, arg5: u64, arg6: &mut 0x2::tx_context::TxContext) : (u64, u64) {
         let v0 = get_position_mut<T0, T1, T2>(arg0, 0x2::tx_context::sender(arg6), arg2, arg3);
         let v1 = if (arg4 > v0.tokens_owed_a) {
             v0.tokens_owed_a
@@ -374,15 +374,15 @@ module turbos_clmm::pool {
         (v2, v3)
     }
     
-    public(friend) fun collect_reward<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: address, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg5: u64, arg6: u64, arg7: &mut 0x2::tx_context::TxContext) : u64 {
+    public(friend) fun collect_reward<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: address, arg3: turbos_clmm::i32::I32, arg4: turbos_clmm::i32::I32, arg5: u64, arg6: u64, arg7: &mut 0x2::tx_context::TxContext) : u64 {
         abort 0
     }
     
-    public(friend) fun collect_reward_v2<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: address, arg3: address, arg4: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg5: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg6: u64, arg7: u64, arg8: &mut 0x2::tx_context::TxContext) : u64 {
+    public(friend) fun collect_reward_v2<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: address, arg3: address, arg4: turbos_clmm::i32::I32, arg5: turbos_clmm::i32::I32, arg6: u64, arg7: u64, arg8: &mut 0x2::tx_context::TxContext) : u64 {
         abort 0
     }
     
-    public(friend) fun collect_reward_with_return_<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: address, arg3: address, arg4: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg5: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg6: u64, arg7: u64, arg8: &mut 0x2::tx_context::TxContext) : 0x2::coin::Coin<T3> {
+    public(friend) fun collect_reward_with_return_<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: address, arg3: address, arg4: turbos_clmm::i32::I32, arg5: turbos_clmm::i32::I32, arg6: u64, arg7: u64, arg8: &mut 0x2::tx_context::TxContext) : 0x2::coin::Coin<T3> {
         assert!(0x1::vector::borrow<PoolRewardInfo>(&arg0.reward_infos, arg7).vault == 0x2::object::id_address<PoolRewardVault<T3>>(arg1), 14);
         let v0 = get_position_mut<T0, T1, T2>(arg0, arg3, arg4, arg5);
         assert!(arg7 < 0x1::vector::length<PositionRewardInfo>(&v0.reward_infos), 13);
@@ -409,7 +409,7 @@ module turbos_clmm::pool {
         0x2::coin::from_balance<T3>(0x2::balance::split<T3>(&mut arg1.coin, v2), arg8)
     }
     
-    public(friend) fun collect_v2<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: address, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg5: u64, arg6: u64, arg7: &mut 0x2::tx_context::TxContext) : (u64, u64) {
+    public(friend) fun collect_v2<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: address, arg3: turbos_clmm::i32::I32, arg4: turbos_clmm::i32::I32, arg5: u64, arg6: u64, arg7: &mut 0x2::tx_context::TxContext) : (u64, u64) {
         let v0 = get_position_mut<T0, T1, T2>(arg0, arg2, arg3, arg4);
         let v1 = if (arg5 > v0.tokens_owed_a) {
             v0.tokens_owed_a
@@ -475,20 +475,20 @@ module turbos_clmm::pool {
         while (v4.amount_specified_remaining > 0 && v4.sqrt_price != arg5) {
             let (v5, v6) = next_initialized_tick_within_one_word<T0, T1, T2>(arg0, v4.tick_current_index, arg2);
             let v7 = v5;
-            if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lt(v5, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::neg_from(443636))) {
-                v7 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::neg_from(443636);
+            if (turbos_clmm::i32::lt(v5, turbos_clmm::i32::neg_from(443636))) {
+                v7 = turbos_clmm::i32::neg_from(443636);
             } else {
-                if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::gt(v5, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(443636))) {
-                    v7 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(443636);
+                if (turbos_clmm::i32::gt(v5, turbos_clmm::i32::from(443636))) {
+                    v7 = turbos_clmm::i32::from(443636);
                 };
             };
-            let v8 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::sqrt_price_from_tick_index(v7);
+            let v8 = turbos_clmm::math_tick::sqrt_price_from_tick_index(v7);
             let v9 = if (arg2 && v8 < arg5 || v8 > arg5) {
                 arg5
             } else {
                 v8
             };
-            let (v10, v11, v12, v13) = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_swap::compute_swap(v4.sqrt_price, v9, v4.liquidity, v4.amount_specified_remaining, arg4, arg0.fee);
+            let (v10, v11, v12, v13) = turbos_clmm::math_swap::compute_swap(v4.sqrt_price, v9, v4.liquidity, v4.amount_specified_remaining, arg4, arg0.fee);
             let v14 = v13;
             v4.sqrt_price = v10;
             if (arg4) {
@@ -502,10 +502,10 @@ module turbos_clmm::pool {
             if (arg0.fee_protocol > 0) {
                 let v15 = v13 * (arg0.fee_protocol as u128) / 1000000;
                 v14 = v13 - v15;
-                v4.protocol_fee = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_add(v4.protocol_fee, v15);
+                v4.protocol_fee = turbos_clmm::math_u128::wrapping_add(v4.protocol_fee, v15);
             };
             if (v4.liquidity > 0) {
-                v4.fee_growth_global = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_add(v4.fee_growth_global, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::full_math_u128::mul_div_floor(v14, 18446744073709551616, v4.liquidity));
+                v4.fee_growth_global = turbos_clmm::math_u128::wrapping_add(v4.fee_growth_global, turbos_clmm::full_math_u128::mul_div_floor(v14, 18446744073709551616, v4.liquidity));
             };
             if (v4.sqrt_price == v8) {
                 if (v6) {
@@ -522,12 +522,12 @@ module turbos_clmm::pool {
                     let v18 = cross_tick<T0, T1, T2>(arg0, v7, v16, v17, &v2, arg6, arg8);
                     let v19 = v18;
                     if (arg2) {
-                        v19 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::neg(v18);
+                        v19 = turbos_clmm::i128::neg(v18);
                     };
-                    v4.liquidity = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_liquidity::add_delta(v4.liquidity, v19);
+                    v4.liquidity = turbos_clmm::math_liquidity::add_delta(v4.liquidity, v19);
                 };
                 let v20 = if (arg2) {
-                    0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::sub(v7, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(1))
+                    turbos_clmm::i32::sub(v7, turbos_clmm::i32::from(1))
                 } else {
                     v7
                 };
@@ -535,12 +535,12 @@ module turbos_clmm::pool {
                 continue
             };
             if (v4.sqrt_price != v4.sqrt_price) {
-                v4.tick_current_index = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::tick_index_from_sqrt_price(v4.sqrt_price);
+                v4.tick_current_index = turbos_clmm::math_tick::tick_index_from_sqrt_price(v4.sqrt_price);
                 continue
             };
         };
         if (!arg6) {
-            if (!0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::eq(v4.tick_current_index, arg0.tick_current_index)) {
+            if (!turbos_clmm::i32::eq(v4.tick_current_index, arg0.tick_current_index)) {
                 arg0.sqrt_price = v4.sqrt_price;
                 arg0.tick_current_index = v4.tick_current_index;
             } else {
@@ -586,19 +586,19 @@ module turbos_clmm::pool {
         v4
     }
     
-    fun cross_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: u128, arg3: u128, arg4: &vector<u128>, arg5: bool, arg6: &mut 0x2::tx_context::TxContext) : 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::I128 {
-        let v0 = if (!0x2::dynamic_field::exists_<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32>(&arg0.id, arg1)) {
+    fun cross_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: u128, arg3: u128, arg4: &vector<u128>, arg5: bool, arg6: &mut 0x2::tx_context::TxContext) : turbos_clmm::i128::I128 {
+        let v0 = if (!0x2::dynamic_field::exists_<turbos_clmm::i32::I32>(&arg0.id, arg1)) {
             init_tick<T0, T1, T2>(arg0, arg1, arg6)
         } else {
-            0x2::dynamic_field::borrow_mut<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, Tick>(&mut arg0.id, arg1)
+            0x2::dynamic_field::borrow_mut<turbos_clmm::i32::I32, Tick>(&mut arg0.id, arg1)
         };
         if (!arg5) {
-            v0.fee_growth_outside_a = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg2, v0.fee_growth_outside_a);
-            v0.fee_growth_outside_b = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg3, v0.fee_growth_outside_b);
+            v0.fee_growth_outside_a = turbos_clmm::math_u128::wrapping_sub(arg2, v0.fee_growth_outside_a);
+            v0.fee_growth_outside_b = turbos_clmm::math_u128::wrapping_sub(arg3, v0.fee_growth_outside_b);
             let v1 = 0;
             while (v1 < 0x1::vector::length<u128>(arg4)) {
                 let v2 = 0x1::vector::borrow_mut<u128>(&mut v0.reward_growths_outside, v1);
-                *v2 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(*0x1::vector::borrow<u128>(arg4, v1), *v2);
+                *v2 = turbos_clmm::math_u128::wrapping_sub(*0x1::vector::borrow<u128>(arg4, v1), *v2);
                 v1 = v1 + 1;
             };
         };
@@ -613,25 +613,25 @@ module turbos_clmm::pool {
             protocol_fees_a             : 0, 
             protocol_fees_b             : 0, 
             sqrt_price                  : arg2, 
-            tick_current_index          : 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::tick_index_from_sqrt_price(arg2), 
+            tick_current_index          : turbos_clmm::math_tick::tick_index_from_sqrt_price(arg2), 
             tick_spacing                : arg1, 
-            max_liquidity_per_tick      : 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::max_liquidity_per_tick(arg1), 
+            max_liquidity_per_tick      : turbos_clmm::math_tick::max_liquidity_per_tick(arg1), 
             fee                         : arg0, 
             fee_protocol                : arg3, 
             unlocked                    : true, 
             fee_growth_global_a         : 0, 
             fee_growth_global_b         : 0, 
             liquidity                   : 0, 
-            tick_map                    : 0x2::table::new<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, u256>(arg5), 
+            tick_map                    : 0x2::table::new<turbos_clmm::i32::I32, u256>(arg5), 
             deploy_time_ms              : 0x2::clock::timestamp_ms(arg4), 
             reward_infos                : 0x1::vector::empty<PoolRewardInfo>(), 
             reward_last_updated_time_ms : 0,
         }
     }
     
-    fun flip_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: &mut 0x2::tx_context::TxContext) {
-        assert!(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::eq(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::mod_euclidean(arg1, arg0.tick_spacing), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::zero()), 12);
-        let (v0, v1) = position_tick(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::div(arg1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(arg0.tick_spacing)));
+    fun flip_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: &mut 0x2::tx_context::TxContext) {
+        assert!(turbos_clmm::i32::eq(turbos_clmm::i32::mod_euclidean(arg1, arg0.tick_spacing), turbos_clmm::i32::zero()), 12);
+        let (v0, v1) = position_tick(turbos_clmm::i32::div(arg1, turbos_clmm::i32::from(arg0.tick_spacing)));
         try_init_tick_word<T0, T1, T2>(arg0, v0);
         let v2 = get_tick_word_mut<T0, T1, T2>(arg0, v0);
         *v2 = *v2 ^ 1 << v1;
@@ -645,7 +645,7 @@ module turbos_clmm::pool {
         (0x2::balance::value<T0>(&arg0.coin_a), 0x2::balance::value<T1>(&arg0.coin_b))
     }
     
-    public fun get_pool_current_index<T0, T1, T2>(arg0: &Pool<T0, T1, T2>) : 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32 {
+    public fun get_pool_current_index<T0, T1, T2>(arg0: &Pool<T0, T1, T2>) : turbos_clmm::i32::I32 {
         arg0.tick_current_index
     }
     
@@ -661,7 +661,7 @@ module turbos_clmm::pool {
         arg0.tick_spacing
     }
     
-    public fun get_position<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : &Position {
+    public fun get_position<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: address, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32) : &Position {
         get_position_by_key<T0, T1, T2>(arg0, get_position_key(arg1, arg2, arg3))
     }
     
@@ -682,7 +682,7 @@ module turbos_clmm::pool {
         get_position_by_key<T0, T1, T2>(arg0, arg1).fee_growth_inside_b
     }
     
-    fun get_position_mut<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : &mut Position {
+    fun get_position_mut<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32) : &mut Position {
         get_position_mut_by_key<T0, T1, T2>(arg0, get_position_key(arg1, arg2, arg3))
     }
     
@@ -698,17 +698,17 @@ module turbos_clmm::pool {
         &get_position_by_key<T0, T1, T2>(arg0, arg1).reward_infos
     }
     
-    public fun get_tick<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : &Tick {
-        assert!(0x2::dynamic_field::exists_<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32>(&arg0.id, arg1), 0);
-        0x2::dynamic_field::borrow<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, Tick>(&arg0.id, arg1)
+    public fun get_tick<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32) : &Tick {
+        assert!(0x2::dynamic_field::exists_<turbos_clmm::i32::I32>(&arg0.id, arg1), 0);
+        0x2::dynamic_field::borrow<turbos_clmm::i32::I32, Tick>(&arg0.id, arg1)
     }
     
-    fun get_tick_word<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : u256 {
-        *0x2::table::borrow<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, u256>(&arg0.tick_map, arg1)
+    fun get_tick_word<T0, T1, T2>(arg0: &Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32) : u256 {
+        *0x2::table::borrow<turbos_clmm::i32::I32, u256>(&arg0.tick_map, arg1)
     }
     
-    fun get_tick_word_mut<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : &mut u256 {
-        0x2::table::borrow_mut<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, u256>(&mut arg0.tick_map, arg1)
+    fun get_tick_word_mut<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32) : &mut u256 {
+        0x2::table::borrow_mut<turbos_clmm::i32::I32, u256>(&mut arg0.tick_map, arg1)
     }
     
     fun init(arg0: &mut 0x2::tx_context::TxContext) {
@@ -745,7 +745,7 @@ module turbos_clmm::pool {
         v0
     }
     
-    fun init_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: &mut 0x2::tx_context::TxContext) : &mut Tick {
+    fun init_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: &mut 0x2::tx_context::TxContext) : &mut Tick {
         let v0 = 0x1::vector::empty<u128>();
         let v1 = 0;
         while (v1 < 3) {
@@ -755,14 +755,14 @@ module turbos_clmm::pool {
         let v2 = Tick{
             id                     : 0x2::object::new(arg2), 
             liquidity_gross        : 0, 
-            liquidity_net          : 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero(), 
+            liquidity_net          : turbos_clmm::i128::zero(), 
             fee_growth_outside_a   : 0, 
             fee_growth_outside_b   : 0, 
             reward_growths_outside : v0, 
             initialized            : false,
         };
-        0x2::dynamic_field::add<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, Tick>(&mut arg0.id, arg1, v2);
-        0x2::dynamic_field::borrow_mut<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, Tick>(&mut arg0.id, arg1)
+        0x2::dynamic_field::add<turbos_clmm::i32::I32, Tick>(&mut arg0.id, arg1, v2);
+        0x2::dynamic_field::borrow_mut<turbos_clmm::i32::I32, Tick>(&mut arg0.id, arg1)
     }
     
     public(friend) fun merge_coin<T0>(arg0: vector<0x2::coin::Coin<T0>>) : 0x2::coin::Coin<T0> {
@@ -807,8 +807,8 @@ module turbos_clmm::pool {
     public(friend) fun mint<T0, T1, T2>(
         arg0: &mut Pool<T0, T1, T2>,
         arg1: address,
-        arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32,
-        arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32,
+        arg2: turbos_clmm::i32::I32,
+        arg3: turbos_clmm::i32::I32,
         arg4: u128,
         arg5: &0x2::clock::Clock,
         arg6: &mut 0x2::tx_context::TxContext
@@ -818,10 +818,10 @@ module turbos_clmm::pool {
         };
         assert!(arg4 > 0, 1);
         try_init_position<T0, T1, T2>(arg0, arg1, arg2, arg3, arg6);
-        let (v0, v1) = modify_position<T0, T1, T2>(arg0, arg1, arg2, arg3, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::from(arg4), arg5, arg6);
-        assert!(!0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::is_neg(v0) && !0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::is_neg(v1), 3);
-        let v2 = (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::abs_u128(v0) as u64);
-        let v3 = (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::abs_u128(v1) as u64);
+        let (v0, v1) = modify_position<T0, T1, T2>(arg0, arg1, arg2, arg3, turbos_clmm::i128::from(arg4), arg5, arg6);
+        assert!(!turbos_clmm::i128::is_neg(v0) && !turbos_clmm::i128::is_neg(v1), 3);
+        let v2 = (turbos_clmm::i128::abs_u128(v0) as u64);
+        let v3 = (turbos_clmm::i128::abs_u128(v1) as u64);
         let v4 = MintEvent{
             pool             : 0x2::object::id<Pool<T0, T1, T2>>(arg0), 
             owner            : arg1, 
@@ -835,54 +835,64 @@ module turbos_clmm::pool {
         (v2, v3)
     }
     
-    fun modify_position<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::I128, arg5: &0x2::clock::Clock, arg6: &mut 0x2::tx_context::TxContext) : (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::I128, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::I128) {
+    fun modify_position<T0, T1, T2>(
+        arg0: &mut Pool<T0, T1, T2>,
+        arg1: address,
+        arg2: turbos_clmm::i32::I32,
+        arg3: turbos_clmm::i32::I32,
+        arg4: turbos_clmm::i128::I128,
+        arg5: &0x2::clock::Clock,
+        arg6: &mut 0x2::tx_context::TxContext
+    ) : (
+        turbos_clmm::i128::I128, turbos_clmm::i128::I128
+    ) {
         check_ticks(arg2, arg3);
         update_position<T0, T1, T2>(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
-        let v0 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero();
-        let v1 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero();
-        if (!0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::eq(arg4, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero())) {
-            if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lt(arg0.tick_current_index, arg2)) {
-                v0 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_sqrt_price::get_amount_a_delta(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::sqrt_price_from_tick_index(arg2), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::sqrt_price_from_tick_index(arg3), arg4);
+        let v0 = turbos_clmm::i128::zero();
+        let v1 = turbos_clmm::i128::zero();
+        if (!turbos_clmm::i128::eq(arg4, turbos_clmm::i128::zero())) {
+            if (turbos_clmm::i32::lt(arg0.tick_current_index, arg2)) {
+                v0 = turbos_clmm::math_sqrt_price::get_amount_a_delta(turbos_clmm::math_tick::sqrt_price_from_tick_index(arg2), turbos_clmm::math_tick::sqrt_price_from_tick_index(arg3), arg4);
             } else {
-                if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lt(arg0.tick_current_index, arg3)) {
-                    v0 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_sqrt_price::get_amount_a_delta(arg0.sqrt_price, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::sqrt_price_from_tick_index(arg3), arg4);
-                    v1 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_sqrt_price::get_amount_b_delta(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::sqrt_price_from_tick_index(arg2), arg0.sqrt_price, arg4);
-                    arg0.liquidity = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_liquidity::add_delta(arg0.liquidity, arg4);
+                if (turbos_clmm::i32::lt(arg0.tick_current_index, arg3)) {
+                    v0 = turbos_clmm::math_sqrt_price::get_amount_a_delta(arg0.sqrt_price, turbos_clmm::math_tick::sqrt_price_from_tick_index(arg3), arg4);
+                    v1 = turbos_clmm::math_sqrt_price::get_amount_b_delta(turbos_clmm::math_tick::sqrt_price_from_tick_index(arg2), arg0.sqrt_price, arg4);
+                    arg0.liquidity = turbos_clmm::math_liquidity::add_delta(arg0.liquidity, arg4);
                 } else {
-                    v1 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_sqrt_price::get_amount_b_delta(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::sqrt_price_from_tick_index(arg2), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_tick::sqrt_price_from_tick_index(arg3), arg4);
+                    v1 = turbos_clmm::math_sqrt_price::get_amount_b_delta(turbos_clmm::math_tick::sqrt_price_from_tick_index(arg2), turbos_clmm::math_tick::sqrt_price_from_tick_index(arg3), arg4);
                 };
             };
         };
         (v0, v1)
     }
     
-    public(friend) fun modify_position_reward_inside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: address, arg4: u64, arg5: u128) {
+    public(friend) fun modify_position_reward_inside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: turbos_clmm::i32::I32, arg3: address, arg4: u64, arg5: u128) {
         0x1::vector::borrow_mut<PositionRewardInfo>(&mut get_position_mut<T0, T1, T2>(arg0, arg3, arg1, arg2).reward_infos, arg4).reward_growth_inside = arg5;
     }
     
-    public(friend) fun modify_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) {
-        if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lte(arg1, arg0.tick_current_index)) {
+    public(friend) fun modify_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32) {
+        if (turbos_clmm::i32::lte(arg1, arg0.tick_current_index)) {
             modify_tick_reward_outside<T0, T1, T2>(arg0, arg1, 0, 0x1::vector::borrow<PoolRewardInfo>(&arg0.reward_infos, 0).growth_global);
         } else {
             modify_tick_reward_outside<T0, T1, T2>(arg0, arg1, 0, 0);
         };
     }
     
-    public(friend) fun modify_tick_reward<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) {
-        if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lte(arg1, arg0.tick_current_index)) {
+    public(friend) fun modify_tick_reward<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: turbos_clmm::i32::I32) {
+        if (turbos_clmm::i32::lte(arg1, arg0.tick_current_index)) {
             modify_tick_reward_outside<T0, T1, T2>(arg0, arg1, 0, 0x1::vector::borrow<PoolRewardInfo>(&arg0.reward_infos, 0).growth_global);
         } else {
             modify_tick_reward_outside<T0, T1, T2>(arg0, arg1, 0, 0);
         };
-        if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lte(arg2, arg0.tick_current_index)) {
+        if (turbos_clmm::i32::lte(arg2, arg0.tick_current_index)) {
             modify_tick_reward_outside<T0, T1, T2>(arg0, arg2, 0, 0x1::vector::borrow<PoolRewardInfo>(&arg0.reward_infos, 0).growth_global);
         } else {
             modify_tick_reward_outside<T0, T1, T2>(arg0, arg2, 0, 0);
         };
     }
     
-    fun modify_tick_reward_outside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: u64, arg3: u128) {
-        let v0 = 0x1::vector::borrow_mut<u128>(&mut 0x2::dynamic_field::borrow_mut<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, Tick>(&mut arg0.id, arg1).reward_growths_outside, arg2);
+    fun modify_tick_reward_outside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: u64, arg3: u128) {
+        let v0 = 0x1::vector::borrow_mut<u128>(&mut 0x2::dynamic_field::borrow_mut<turbos_clmm::i32::I32, Tick>(&mut arg0.id, arg1).reward_growths_outside, arg2);
         *v0 = arg3;
         let v1 = ModifyTickRewardEvent{
             pool       : 0x2::object::id<Pool<T0, T1, T2>>(arg0), 
@@ -892,54 +902,54 @@ module turbos_clmm::pool {
         0x2::event::emit<ModifyTickRewardEvent>(v1);
     }
     
-    fun next_fee_growth_inside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: &mut 0x2::tx_context::TxContext) : (u128, u128) {
+    fun next_fee_growth_inside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32, arg4: &mut 0x2::tx_context::TxContext) : (u128, u128) {
         let v0 = get_tick<T0, T1, T2>(arg0, arg1);
         let v1 = get_tick<T0, T1, T2>(arg0, arg2);
         let (v2, v3) = if (!v0.initialized) {
             (arg0.fee_growth_global_a, arg0.fee_growth_global_b)
         } else {
-            if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::gte(arg3, arg1)) {
+            if (turbos_clmm::i32::gte(arg3, arg1)) {
                 (v0.fee_growth_outside_a, v0.fee_growth_outside_b)
             } else {
-                (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg0.fee_growth_global_a, v0.fee_growth_outside_a), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg0.fee_growth_global_b, v0.fee_growth_outside_b))
+                (turbos_clmm::math_u128::wrapping_sub(arg0.fee_growth_global_a, v0.fee_growth_outside_a), turbos_clmm::math_u128::wrapping_sub(arg0.fee_growth_global_b, v0.fee_growth_outside_b))
             }
         };
         let (v4, v5) = if (!v0.initialized) {
             (0, 0)
         } else {
-            if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lt(arg3, arg2)) {
+            if (turbos_clmm::i32::lt(arg3, arg2)) {
                 (v1.fee_growth_outside_a, v1.fee_growth_outside_b)
             } else {
-                (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg0.fee_growth_global_a, v1.fee_growth_outside_a), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg0.fee_growth_global_b, v1.fee_growth_outside_b))
+                (turbos_clmm::math_u128::wrapping_sub(arg0.fee_growth_global_a, v1.fee_growth_outside_a), turbos_clmm::math_u128::wrapping_sub(arg0.fee_growth_global_b, v1.fee_growth_outside_b))
             }
         };
-        (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg0.fee_growth_global_a, v2), v4), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg0.fee_growth_global_b, v3), v5))
+        (turbos_clmm::math_u128::wrapping_sub(turbos_clmm::math_u128::wrapping_sub(arg0.fee_growth_global_a, v2), v4), turbos_clmm::math_u128::wrapping_sub(turbos_clmm::math_u128::wrapping_sub(arg0.fee_growth_global_b, v3), v5))
     }
     
-    fun next_initialized_tick_within_one_word<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: bool) : (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, bool) {
-        let v0 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::div(arg1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(arg0.tick_spacing));
+    fun next_initialized_tick_within_one_word<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: bool) : (turbos_clmm::i32::I32, bool) {
+        let v0 = turbos_clmm::i32::div(arg1, turbos_clmm::i32::from(arg0.tick_spacing));
         let v1 = v0;
-        if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lt(arg1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::zero()) && !0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::eq(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::mod_euclidean(arg1, arg0.tick_spacing), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::zero())) {
-            v1 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::sub(v0, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(1));
+        if (turbos_clmm::i32::lt(arg1, turbos_clmm::i32::zero()) && !turbos_clmm::i32::eq(turbos_clmm::i32::mod_euclidean(arg1, arg0.tick_spacing), turbos_clmm::i32::zero())) {
+            v1 = turbos_clmm::i32::sub(v0, turbos_clmm::i32::from(1));
         };
         let (v2, v3) = if (arg2) {
             let (v4, v5) = position_tick(v1);
             try_init_tick_word<T0, T1, T2>(arg0, v4);
             let v6 = get_tick_word<T0, T1, T2>(arg0, v4) & (1 << v5) - 1 + (1 << v5);
             let v7 = if (v6 != 0) {
-                0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::mul(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::sub(v1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(((v5 - 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_bit::most_significant_bit(v6)) as u32))), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(arg0.tick_spacing))
+                turbos_clmm::i32::mul(turbos_clmm::i32::sub(v1, turbos_clmm::i32::from(((v5 - turbos_clmm::math_bit::most_significant_bit(v6)) as u32))), turbos_clmm::i32::from(arg0.tick_spacing))
             } else {
-                0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::mul(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::sub(v1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from((v5 as u32))), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(arg0.tick_spacing))
+                turbos_clmm::i32::mul(turbos_clmm::i32::sub(v1, turbos_clmm::i32::from((v5 as u32))), turbos_clmm::i32::from(arg0.tick_spacing))
             };
             (v12, v7)
         } else {
-            let (v8, v9) = position_tick(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::add(v1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(1)));
+            let (v8, v9) = position_tick(turbos_clmm::i32::add(v1, turbos_clmm::i32::from(1)));
             try_init_tick_word<T0, T1, T2>(arg0, v8);
             let v10 = get_tick_word<T0, T1, T2>(arg0, v8) & ((1 << v9) - 1 ^ 115792089237316195423570985008687907853269984665640564039457584007913129639935);
             let v11 = if (v10 != 0) {
-                0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::mul(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::add(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::add(v1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(1)), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::sub(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from((0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_bit::least_significant_bit(v10) as u32)), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from((v9 as u32)))), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(arg0.tick_spacing))
+                turbos_clmm::i32::mul(turbos_clmm::i32::add(turbos_clmm::i32::add(v1, turbos_clmm::i32::from(1)), turbos_clmm::i32::sub(turbos_clmm::i32::from((turbos_clmm::math_bit::least_significant_bit(v10) as u32)), turbos_clmm::i32::from((v9 as u32)))), turbos_clmm::i32::from(arg0.tick_spacing))
             } else {
-                0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::mul(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::add(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::add(v1, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(1)), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(((255 - v9) as u32))), 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::from(arg0.tick_spacing))
+                turbos_clmm::i32::mul(turbos_clmm::i32::add(turbos_clmm::i32::add(v1, turbos_clmm::i32::from(1)), turbos_clmm::i32::from(((255 - v9) as u32))), turbos_clmm::i32::from(arg0.tick_spacing))
             };
             (v13, v11)
         };
@@ -957,7 +967,7 @@ module turbos_clmm::pool {
             if (arg0.liquidity == 0 || v2 == 0) {
                 0x1::vector::insert<u128>(&mut v1, v4.growth_global, v3);
             } else {
-                v4.growth_global = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_add(v4.growth_global, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::full_math_u128::mul_div_floor((v2 as u128), v4.emissions_per_second, arg0.liquidity));
+                v4.growth_global = turbos_clmm::math_u128::wrapping_add(v4.growth_global, turbos_clmm::full_math_u128::mul_div_floor((v2 as u128), v4.emissions_per_second, arg0.liquidity));
                 0x1::vector::insert<u128>(&mut v1, v4.growth_global, v3);
             };
             v3 = v3 + 1;
@@ -971,7 +981,7 @@ module turbos_clmm::pool {
         v1
     }
     
-    fun next_reward_growths_inside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: &mut 0x2::tx_context::TxContext) : vector<u128> {
+    fun next_reward_growths_inside<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32, arg4: &mut 0x2::tx_context::TxContext) : vector<u128> {
         let v0 = 0x1::vector::empty<u128>();
         let v1 = get_tick<T0, T1, T2>(arg0, arg1);
         let v2 = get_tick<T0, T1, T2>(arg0, arg2);
@@ -982,29 +992,29 @@ module turbos_clmm::pool {
             let v6 = if (!v1.initialized) {
                 v4.growth_global
             } else {
-                if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::gte(arg3, arg1)) {
+                if (turbos_clmm::i32::gte(arg3, arg1)) {
                     *0x1::vector::borrow<u128>(&v1.reward_growths_outside, v3)
                 } else {
-                    0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(v4.growth_global, *0x1::vector::borrow<u128>(&v1.reward_growths_outside, v3))
+                    turbos_clmm::math_u128::wrapping_sub(v4.growth_global, *0x1::vector::borrow<u128>(&v1.reward_growths_outside, v3))
                 }
             };
             let v7 = if (!v2.initialized) {
                 0
             } else {
-                if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lt(arg3, arg2)) {
+                if (turbos_clmm::i32::lt(arg3, arg2)) {
                     v5
                 } else {
-                    0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(v4.growth_global, v5)
+                    turbos_clmm::math_u128::wrapping_sub(v4.growth_global, v5)
                 }
             };
-            0x1::vector::insert<u128>(&mut v0, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(v4.growth_global, v6), v7), v3);
+            0x1::vector::insert<u128>(&mut v0, turbos_clmm::math_u128::wrapping_sub(turbos_clmm::math_u128::wrapping_sub(v4.growth_global, v6), v7), v3);
             v3 = v3 + 1;
         };
         v0
     }
     
-    public fun position_tick(arg0: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) : (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, u8) {
-        (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::shr(arg0, 8), (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::abs_u32(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::mod_euclidean(arg0, 256)) as u8))
+    public fun position_tick(arg0: turbos_clmm::i32::I32) : (turbos_clmm::i32::I32, u8) {
+        (turbos_clmm::i32::shr(arg0, 8), (turbos_clmm::i32::abs_u32(turbos_clmm::i32::mod_euclidean(arg0, 256)) as u8))
     }
     
     public(friend) fun remove_reward<T0, T1, T2, T3>(arg0: &mut Pool<T0, T1, T2>, arg1: &mut PoolRewardVault<T3>, arg2: u64, arg3: u64, arg4: address, arg5: &0x2::clock::Clock, arg6: &mut 0x2::tx_context::TxContext) {
@@ -1119,7 +1129,7 @@ module turbos_clmm::pool {
         abort 0
     }
     
-    fun try_init_position<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: &mut 0x2::tx_context::TxContext) {
+    fun try_init_position<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32, arg4: &mut 0x2::tx_context::TxContext) {
         let v0 = get_position_key(arg1, arg2, arg3);
         if (!0x2::dynamic_object_field::exists_<0x1::string::String>(&arg0.id, v0)) {
             let v1 = 0x1::vector::empty<PositionRewardInfo>();
@@ -1145,9 +1155,9 @@ module turbos_clmm::pool {
         };
     }
     
-    fun try_init_tick_word<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32) {
-        if (!0x2::table::contains<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, u256>(&arg0.tick_map, arg1)) {
-            0x2::table::add<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, u256>(&mut arg0.tick_map, arg1, 0);
+    fun try_init_tick_word<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32) {
+        if (!0x2::table::contains<turbos_clmm::i32::I32, u256>(&arg0.tick_map, arg1)) {
+            0x2::table::add<turbos_clmm::i32::I32, u256>(&mut arg0.tick_map, arg1, 0);
         };
     }
     
@@ -1160,12 +1170,12 @@ module turbos_clmm::pool {
         0x2::event::emit<UpdatePoolFeeProtocolEvent>(v0);
     }
     
-    fun update_position<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg4: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::I128, arg5: &0x2::clock::Clock, arg6: &mut 0x2::tx_context::TxContext) {
+    fun update_position<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: address, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i32::I32, arg4: turbos_clmm::i128::I128, arg5: &0x2::clock::Clock, arg6: &mut 0x2::tx_context::TxContext) {
         let v0 = arg0.tick_current_index;
         let v1 = false;
         let v2 = false;
         let v3 = next_pool_reward_infos<T0, T1, T2>(arg0, 0x2::clock::timestamp_ms(arg5));
-        if (!0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::eq(arg4, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero())) {
+        if (!turbos_clmm::i128::eq(arg4, turbos_clmm::i128::zero())) {
             let v4 = update_tick<T0, T1, T2>(arg0, arg2, v0, arg4, false, v3, arg6);
             v1 = v4;
             let v5 = update_tick<T0, T1, T2>(arg0, arg3, v0, arg4, true, v3, arg6);
@@ -1179,7 +1189,7 @@ module turbos_clmm::pool {
         };
         let (v6, v7) = next_fee_growth_inside<T0, T1, T2>(arg0, arg2, arg3, v0, arg6);
         update_position_metadata<T0, T1, T2>(arg0, get_position_key(arg1, arg2, arg3), arg4, v6, v7, next_reward_growths_inside<T0, T1, T2>(arg0, arg2, arg3, v0, arg6), arg6);
-        if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::is_neg(arg4)) {
+        if (turbos_clmm::i128::is_neg(arg4)) {
             if (v1) {
                 clear_tick<T0, T1, T2>(arg0, arg2, arg6);
             };
@@ -1189,31 +1199,31 @@ module turbos_clmm::pool {
         };
     }
     
-    fun update_position_metadata<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x1::string::String, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::I128, arg3: u128, arg4: u128, arg5: vector<u128>, arg6: &mut 0x2::tx_context::TxContext) {
+    fun update_position_metadata<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x1::string::String, arg2: turbos_clmm::i128::I128, arg3: u128, arg4: u128, arg5: vector<u128>, arg6: &mut 0x2::tx_context::TxContext) {
         let v0 = get_position_mut_by_key<T0, T1, T2>(arg0, arg1);
-        let v1 = if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::eq(arg2, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero())) {
+        let v1 = if (turbos_clmm::i128::eq(arg2, turbos_clmm::i128::zero())) {
             assert!(v0.liquidity > 0, 6);
             v0.liquidity
         } else {
-            0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_liquidity::add_delta(v0.liquidity, arg2)
+            turbos_clmm::math_liquidity::add_delta(v0.liquidity, arg2)
         };
-        let v2 = (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::full_math_u128::mul_div_floor(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg3, v0.fee_growth_inside_a), v0.liquidity, 18446744073709551616) as u64);
-        let v3 = (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::full_math_u128::mul_div_floor(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(arg4, v0.fee_growth_inside_b), v0.liquidity, 18446744073709551616) as u64);
+        let v2 = (turbos_clmm::full_math_u128::mul_div_floor(turbos_clmm::math_u128::wrapping_sub(arg3, v0.fee_growth_inside_a), v0.liquidity, 18446744073709551616) as u64);
+        let v3 = (turbos_clmm::full_math_u128::mul_div_floor(turbos_clmm::math_u128::wrapping_sub(arg4, v0.fee_growth_inside_b), v0.liquidity, 18446744073709551616) as u64);
         v0.fee_growth_inside_a = arg3;
         v0.fee_growth_inside_b = arg4;
         if (v2 > 0 || v3 > 0) {
-            v0.tokens_owed_a = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u64::wrapping_add(v0.tokens_owed_a, v2);
-            v0.tokens_owed_b = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u64::wrapping_add(v0.tokens_owed_b, v3);
+            v0.tokens_owed_a = turbos_clmm::math_u64::wrapping_add(v0.tokens_owed_a, v2);
+            v0.tokens_owed_b = turbos_clmm::math_u64::wrapping_add(v0.tokens_owed_b, v3);
         };
         let v4 = 0;
         while (v4 < 0x1::vector::length<PoolRewardInfo>(&arg0.reward_infos)) {
             let v5 = *0x1::vector::borrow<u128>(&arg5, v4);
             let v6 = 0x1::vector::borrow_mut<PositionRewardInfo>(&mut v0.reward_infos, v4);
             v6.reward_growth_inside = v5;
-            v6.amount_owed = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u64::wrapping_add(v6.amount_owed, (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::full_math_u128::mul_div_floor(0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_u128::wrapping_sub(v5, v6.reward_growth_inside), v0.liquidity, 18446744073709551616) as u64));
+            v6.amount_owed = turbos_clmm::math_u64::wrapping_add(v6.amount_owed, (turbos_clmm::full_math_u128::mul_div_floor(turbos_clmm::math_u128::wrapping_sub(v5, v6.reward_growth_inside), v0.liquidity, 18446744073709551616) as u64));
             v4 = v4 + 1;
         };
-        if (!0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::eq(arg2, 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::zero())) {
+        if (!turbos_clmm::i128::eq(arg2, turbos_clmm::i128::zero())) {
             v0.liquidity = v1;
         };
     }
@@ -1246,17 +1256,17 @@ module turbos_clmm::pool {
         0x2::event::emit<UpdateRewardManagerEvent>(v0);
     }
     
-    fun update_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg2: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, arg3: 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::I128, arg4: bool, arg5: vector<u128>, arg6: &mut 0x2::tx_context::TxContext) : bool {
-        let v0 = if (!0x2::dynamic_field::exists_<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32>(&arg0.id, arg1)) {
+    fun update_tick<T0, T1, T2>(arg0: &mut Pool<T0, T1, T2>, arg1: turbos_clmm::i32::I32, arg2: turbos_clmm::i32::I32, arg3: turbos_clmm::i128::I128, arg4: bool, arg5: vector<u128>, arg6: &mut 0x2::tx_context::TxContext) : bool {
+        let v0 = if (!0x2::dynamic_field::exists_<turbos_clmm::i32::I32>(&arg0.id, arg1)) {
             init_tick<T0, T1, T2>(arg0, arg1, arg6)
         } else {
-            0x2::dynamic_field::borrow_mut<0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::I32, Tick>(&mut arg0.id, arg1)
+            0x2::dynamic_field::borrow_mut<turbos_clmm::i32::I32, Tick>(&mut arg0.id, arg1)
         };
         let v1 = v0.liquidity_gross;
-        let v2 = 0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::math_liquidity::add_delta(v1, arg3);
+        let v2 = turbos_clmm::math_liquidity::add_delta(v1, arg3);
         assert!(v2 <= arg0.max_liquidity_per_tick, 11);
         if (v1 == 0) {
-            if (0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i32::lte(arg1, arg2)) {
+            if (turbos_clmm::i32::lte(arg1, arg2)) {
                 v0.fee_growth_outside_a = arg0.fee_growth_global_a;
                 v0.fee_growth_outside_b = arg0.fee_growth_global_b;
                 v0.reward_growths_outside = arg5;
@@ -1265,9 +1275,9 @@ module turbos_clmm::pool {
         };
         v0.liquidity_gross = v2;
         let v3 = if (arg4) {
-            0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::sub(v0.liquidity_net, arg3)
+            turbos_clmm::i128::sub(v0.liquidity_net, arg3)
         } else {
-            0x91bfbc386a41afcfd9b2533058d7e915a1d3829089cc268ff4333d54d6339ca1::i128::add(v0.liquidity_net, arg3)
+            turbos_clmm::i128::add(v0.liquidity_net, arg3)
         };
         v0.liquidity_net = v3;
         v2 == 0 != v1 == 0
